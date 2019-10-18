@@ -52,9 +52,12 @@ app.post('/:collection', function(req, res) {
 	  	
 	  	//console.log(obj)
 
-	  	dbo.collection(req.params.collection).insertOne(obj, function(err, result) {
+	  	dbo.collection(req.params.collection).save(obj, function(err, result) {
 	    if (err) throw err;
-	    res.json(result);
+
+	    obj["id"] = obj["_id"]
+	    delete obj["_id"]
+	    res.json(obj);
 	    //console.log(result.name);
 	    db.close();
 	  });
