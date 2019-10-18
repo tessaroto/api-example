@@ -61,6 +61,31 @@ app.post('/:collection', function(req, res) {
 	});
 });
 
+app.get('/:collection', function(req, res) {
+
+	MongoClient.connect(url, function(err, db) {
+	  if (err) throw err;
+	  	var dbo = db.db("example");
+	  	console.log("get " +req.params.collection)
+
+	  	var limit = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
+	  	var skip = ((req.query.page ? parseInt(req.query.page) : 1) - 1) * limit;
+
+	  	dbo.collection(req.params.collection).find({}).skip(skip).limit(limit).toArray(function(err, docs) {
+	    	if (err) throw err;
+
+	    	for (var i = 0; i < docs.length; i++) {
+	    		var doc = docs[i];
+	    		doc["id"] = doc["_id"]
+		  		delete doc["_id"]
+	    	}
+	    	res.json(docs);
+	    	db.close();
+	  	});
+	});
+});
+
+
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
 });
